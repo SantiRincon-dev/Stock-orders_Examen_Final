@@ -84,12 +84,85 @@ El libro de órdenes utiliza el módulo `heapq` para mantener automáticamente e
 
 # Diagrama de clases (UML)
 
-El diseño completo del sistema puede consultarse en el archivo:
+# Diagrama de clases (UML)
 
-**UML.md**
+```mermaid
+classDiagram
+    direction LR
 
-En este archivo se encuentran todas las clases del proyecto, junto con sus atributos, métodos, relaciones, multiplicidades y modificadores de acceso utilizando la sintaxis Mermaid.
+    class Stock {
+        -float __price
+        +str symbol
+        +str company
+        +get_price() float
+        +set_price(value: float) void
+    }
 
+    class Order {
+        <<abstract>>
+        +str order_id
+        +str trader
+        +str symbol
+        +int quantity
+        +float price
+        +bool is_cancelled
+        #int _seq
+        +execute()* str
+        +get_summary() str
+    }
+
+    class BuyOrder {
+        +execute() str
+    }
+
+    class SellOrder {
+        +execute() str
+    }
+
+    class Transaction {
+        +BuyOrder buy_order
+        +SellOrder sell_order
+        +int quantity
+        +float price
+        +get_summary() str
+    }
+
+    class ExchangeEngine {
+        -dict _buy_heaps
+        -dict _sell_heaps
+        -dict _orders_by_id
+        -list _transactions
+        +place_order(order: Order) void
+        +cancel_order(order_id: str) void
+        +match_orders() Generator~Transaction~
+        +transactions() Generator~Transaction~
+    }
+
+    class InvalidPriceError {
+        <<Exception>>
+    }
+
+    class DuplicateOrderError {
+        <<Exception>>
+    }
+
+    class OrderNotFoundError {
+        <<Exception>>
+    }
+
+    Order <|-- BuyOrder
+    Order <|-- SellOrder
+
+    Transaction "1" o-- "1" BuyOrder : buy_order
+    Transaction "1" o-- "1" SellOrder : sell_order
+
+    ExchangeEngine "1" o-- "0..*" Order : administra
+    ExchangeEngine "1" *-- "0..*" Transaction : genera
+
+    Stock ..> InvalidPriceError : lanza
+    ExchangeEngine ..> DuplicateOrderError : lanza
+    ExchangeEngine ..> OrderNotFoundError : lanza
+```
 ---
 
 # Cómo ejecutar
