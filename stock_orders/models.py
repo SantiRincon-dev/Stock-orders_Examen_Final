@@ -21,7 +21,11 @@ class Stock:
 
 class Transaction:
     def __init__(
-        self, buy_order: bool, sell_order: bool, quantity: int, price: float
+        self,
+        buy_order: "BuyOrder",
+        sell_order: "SellOrder",
+        quantity: int,
+        price: float,
     ) -> None:
         self.buy_order = buy_order
         self.sell_order = sell_order
@@ -29,8 +33,10 @@ class Transaction:
         self.price = price
 
     def get_summary(self) -> str:
-        return f"Transacción exitosa: {self.quantity} {self.buy_order.symbol} a $ {self.price}"
-
+        return (
+            f"Transacción exitosa: {self.quantity} "
+            f"{self.buy_order.symbol} a $ {self.price}"
+        )
 
 class Order(ABC):
     """Clase base abstracta para las órdenes de compra y venta."""
